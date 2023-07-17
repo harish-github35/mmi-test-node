@@ -18,11 +18,10 @@ async function getnewtoken() {
       },
       body: new URLSearchParams(Object.entries(body)),
     }
-  );
-  const newAccessTokenResponse = await response.json();
+  ).then((data) => data.json());
   const newAccessTokenObject = {
     timestamp: new Date().getTime(),
-    ...newAccessTokenResponse,
+    ...response,
   };
 
   // save token and expiry time to token.json in background

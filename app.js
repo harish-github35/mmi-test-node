@@ -2,10 +2,11 @@ const cors = require("cors");
 const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
-
+var cookieParser = require("cookie-parser");
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 const mmiRouter = require("./routes/mmi/mmi.router");
 
