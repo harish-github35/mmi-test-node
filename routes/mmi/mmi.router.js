@@ -1,6 +1,39 @@
 const { Router } = require("express");
 const router = Router();
-const gettoken = require("../../utils/getToken");
+let tokenObject = null;
+const getnewtoken = require("../../utils/getNewToken");
+
+router.get("/search", async (req, res) => {
+  const { address } = req.query;
+  if (!address) {
+    res.status(400).json({
+      data: null,
+      error: true,
+      error_message: "no search term was found in request",
+    });
+  }
+
+  if (
+    !tokenObject ||
+    (Date.now() - tokenObject.timestamp) / (1000 * 60 * 60) > 23
+  ) {
+    tokenObject = await getnewtoken();
+  }
+
+  // use token to get eloc code https://atlas.mappls.com/api/places/search/json?query=""
+  const searchResult = await fetch(
+    `https://atlas.mappls.com/api/places/search/json?query=${address}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `${tokenObject.token_type} ${tokenObject.access_token}`,
+      },
+    }
+  );
+  const resJson = await searchResult.json();
+
+  res.status(200).json({ data: resJson, error: false, error_message: "" });
+});
 
 //replicate this: buyer-app.ondc.org/mmi/api/mmi_pin_info?pincode=600099
 /**
@@ -40,7 +73,12 @@ router.get("/mmi_pin_info", async (req, res) => {
     });
   }
 
-  let tokenObject = await gettoken();
+  if (
+    !tokenObject ||
+    (Date.now() - tokenObject.timestamp) / (1000 * 60 * 60) > 23
+  ) {
+    tokenObject = await getnewtoken();
+  }
 
   // use token to call https://atlas.mappls.com/api/places/geocode?address=pincode
 
@@ -109,21 +147,16 @@ router.get("/mmi_place_info", async (req, res) => {
   }
   const deliveryAddress = JSON.parse(decodeURI(req.cookies.delivery_address));
 
-  const {
-   
-      door,
-      building,
-      street,
-      locality,
-      city,
-      state,
-      country,
-      areaCode,
-    
-  } = deliveryAddress;
+  const { door, building, street, locality, city, state, country, areaCode } =
+    deliveryAddress;
   const location = `${door} ${building} ${street} ${locality} ${city} ${state} ${country} ${areaCode}`;
 
-  let tokenObject = await gettoken();
+  if (
+    !tokenObject ||
+    (Date.now() - tokenObject.timestamp) / (1000 * 60 * 60) > 23
+  ) {
+    tokenObject = await getnewtoken();
+  }
 
   // use token to get eloc code https://atlas.mappls.com/api/places/geocode?address=
   const elocResult = await fetch(

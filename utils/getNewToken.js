@@ -25,13 +25,14 @@ async function getnewtoken() {
   };
 
   // save token and expiry time to token.json in background
-  fs.writeFile(
-    path.join(__dirname, "../routes/mmi/token.json"),
-    JSON.stringify(newAccessTokenObject),
-    {
-      flag: "w",
-    }
-  );
+  // console.log(__dirname);
+  // fs.writeFile(
+  //   path.join(__dirname, "../routes/mmi/token.json"),
+  //   JSON.stringify(newAccessTokenObject),
+  //   {
+  //     flag: "w",
+  //   }
+  // );
 
   return newAccessTokenObject;
 }
