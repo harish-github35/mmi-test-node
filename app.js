@@ -13,7 +13,11 @@ const mmiRouter = require('./routes/mmi/mmi.router');
 app.use('/mmi/api', mmiRouter);
 
 app.post('/user', (req, res) => {
-  res.json({ message: 'callback has been called', req });
+  res.status(200).json({
+    message: 'callback has been called',
+    query: req.query,
+    body: req.body,
+  });
 });
 
 const PORT = process.env.PORT;
